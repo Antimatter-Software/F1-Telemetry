@@ -1,0 +1,95 @@
+{
+    "name": "telemetry-server",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/telemetry-server/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nrwl/esbuild:esbuild",
+            "outputs": [
+                "{options.outputPath}"
+            ],
+            "defaultConfiguration": "production",
+            "options": {
+                "platform": "node",
+                "outputPath": "dist/apps/telemetry-server",
+                "format": [
+                    "cjs"
+                ],
+                "bundle": false,
+                "main": "apps/telemetry-server/src/main.ts",
+                "tsConfig": "apps/telemetry-server/tsconfig.app.json",
+                "assets": [
+                    "apps/telemetry-server/src/assets"
+                ],
+                "esbuildOptions": {
+                    "sourcemap": true,
+                    "outExtension": {
+                        ".js": ".js"
+                    }
+                }
+            },
+            "configurations": {
+                "development": {},
+                "production": {
+                    "generateLockfile": true,
+                    "esbuildOptions": {
+                        "sourcemap": false,
+                        "outExtension": {
+                            ".js": ".js"
+                        }
+                    }
+                }
+            }
+        },
+        "serve": {
+            "executor": "@nrwl/js:node",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "telemetry-server:build"
+            },
+            "configurations": {
+                "development": {
+                    "buildTarget": "telemetry-server:build:development"
+                },
+                "production": {
+                    "buildTarget": "telemetry-server:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": [
+                "{options.outputFile}"
+            ],
+            "options": {
+                "lintFilePatterns": [
+                    "apps/telemetry-server/**/*.ts"
+                ]
+            }
+        },
+        "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+            ],
+            "options": {
+                "jestConfig": "apps/telemetry-server/jest.config.ts",
+                "passWithNoTests": true
+            },
+            "configurations": {
+                "ci": {
+                    "ci": true,
+                    "codeCoverage": true
+                }
+            }
+        },
+        "docker-build": {
+            "dependsOn": [
+                "build"
+            ],
+            "command": "docker build -f apps/telemetry-server/Dockerfile . -t telemetry-server"
+        }
+    },
+    "tags": []
+}
